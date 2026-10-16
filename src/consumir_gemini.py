@@ -4,22 +4,34 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
+# El error de las responsabilidades de esta función de armar petición, es que el usuario no haya indicado ninguna pregunta.
 def armar_peticion(pregunta):
+    if not pregunta:
+        raise ValueError("La pregunta no puede estar vacía.")
     api_key = os.getenv("GEMINI_API_KEY")
     modelo = "gemini-3.8-flash"
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent?key={api_key}"
+    url =  f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent?key={api_key}"
     body = {"contents": [{"parts": [{"text": pregunta}]}]}
     return url, body
 
-
+#Hacer esto significa: intenta esto, pero si falla esta forma específica, haz esto
 def enviar_peticion(url, body):
-    respuesta = requests.post(url, json=body)
+    try:
+        respuesta = requests.post(url, json=body)
+    except requests.exceptions.ConnectionError:
+        raise RuntimeError("Error de conexión. Por favor, verifica tu conexión a internet.")
+    try:
+        return respuesta.json()
+    except requests.exceptions.JSONDecodeError:
+        raise RuntimeError("La respuesta del servicio no llegó en el formato esperado (JSON)")
     return respuesta.json()
 
 
 def extraer_texto(datos):
-    return datos["candidates"][0]["content"]["parts"][0]["text"]
+    try:
+        return datos["candidates"][0]["content"]["parts"][0]["text"]
+    except (KeyError, IndexError):
+        raise RuntimeError("La respuesta no trae el texto generado en el lugar esperado. Revisa tu API key en el archivo .env.")
 
 
 def obtener_dato_de_prueba(pregunta):
@@ -28,4 +40,9 @@ def obtener_dato_de_prueba(pregunta):
     return extraer_texto(datos)
 
 
-print(obtener_dato_de_prueba("Confirma en una frase corta que esta conexión funciona."))
+pregunta = "Confirma en una frase corta que esta conexión funciona."
+try:
+    resultado = obtener_dato_de_prueba(pregunta)
+    print(resultado)
+except (ValueError, RuntimeError) as error:
+    print("No se pudo completar la operación:", error)
