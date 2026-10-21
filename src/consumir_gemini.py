@@ -9,7 +9,7 @@ def armar_peticion(pregunta):
     if not pregunta:
         raise ValueError("La pregunta no puede estar vacía.")
     api_key = os.getenv("GEMINI_API_KEY")
-    modelo = "gemini-3.8-flash"
+    modelo = "gemini-3.1-flash-lite"
     url =  f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent?key={api_key}"
     body = {"contents": [{"parts": [{"text": pregunta}]}]}
     return url, body
@@ -58,10 +58,11 @@ def obtener_dato_de_prueba(pregunta):
     return texto, costo
 
 
-pregunta = "Confirma en una frase corta que esta conexión funciona."
-try:
-    resultado, costo = obtener_dato_de_prueba(pregunta)
-    print(resultado)
-    print(f"Costo de esta petición: US$ {costo:.6f}")
-except (ValueError, RuntimeError) as error:
-    print("No se pudo completar la operación:", error)
+if __name__ == "__main__":
+    pregunta = "Confirma en una frase corta que esta conexión funciona."
+    try:
+        resultado, costo = obtener_dato_de_prueba(pregunta)
+        print(resultado)
+        print(f"Costo de esta petición: US$ {costo:.6f}")
+    except (ValueError, RuntimeError) as error:
+        print("No se pudo completar la operación:", error)
