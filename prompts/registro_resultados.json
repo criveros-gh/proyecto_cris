@@ -1,0 +1,14 @@
+{
+  "crear_carta": {
+    "exitos": 3,
+    "intentos": 3
+  },
+  "describir_apariencia": {
+    "exitos": 3,
+    "intentos": 3
+  },
+  "clasificar_rareza": {
+    "exitos": 2,
+    "intentos": 3
+  }
+}
