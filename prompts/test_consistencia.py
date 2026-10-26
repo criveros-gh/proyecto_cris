@@ -36,5 +36,7 @@ for prompt in BANCO_DE_PROMPTS:
     print(f"{prompt['nombre']}: {exitos}/{intentos} respuestas válidas")
     registro[prompt["nombre"]] = {"exitos": exitos, "intentos": intentos}
 
-with open("prompts/registro_resultados.json", "w", encoding="utf-8") as archivo:
+# Ruta relativa a este archivo (no a la carpeta desde donde se ejecute el script)
+ruta_registro = os.path.join(os.path.dirname(__file__), "registro_resultados.json")
+with open(ruta_registro, "w", encoding="utf-8") as archivo:
     json.dump(registro, archivo, indent=2, ensure_ascii=False)

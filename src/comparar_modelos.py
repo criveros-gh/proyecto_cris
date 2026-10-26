@@ -31,11 +31,13 @@ for i in range(4):
     respuesta_valida = respuesta_json
     print(f"Intento {i + 1}: {latencias[-1]:.2f} segundos")
 
-latencia_promedio = sum(latencias) / len(latencias)
-print(f"Latencia promedio: {latencia_promedio:.2f} segundos")
-
-costo = calcular_costo(respuesta_valida, PRECIO_ENTRADA, PRECIO_SALIDA)
-print(f"Costo de la última petición: {costo}")
+if latencias:
+    latencia_promedio = sum(latencias) / len(latencias)
+    print(f"Latencia promedio: {latencia_promedio:.2f} segundos")
+    costo = calcular_costo(respuesta_valida, PRECIO_ENTRADA, PRECIO_SALIDA)
+    print(f"Costo de la última petición: {costo}")
+else:
+    print("Ningún intento terminó bien: no hay latencia ni costo que promediar.")
 
 
 

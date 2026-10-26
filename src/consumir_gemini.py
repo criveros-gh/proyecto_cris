@@ -6,11 +6,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+MODELO = "gemini-3.1-flash-lite"  # elegido en docs/decision-arquitectura.md (Bloque 9)
+
+# Prompt de sistema por defecto: se usa cuando quien llama no entrega uno propio.
+SYSTEM_INSTRUCTION_POR_DEFECTO = (
+    "Eres un asistente experto en gatos callejeros. Responde en español, "
+    "de forma breve y en una sola frase."
+)
+
 # El error de las responsabilidades de esta función de armar petición, es que el usuario no haya indicado ninguna pregunta.
-def armar_peticion(pregunta_usuario, system_instruction, response_schema=None):
+def armar_peticion(pregunta_usuario, system_instruction=SYSTEM_INSTRUCTION_POR_DEFECTO, response_schema=None):
     if not pregunta_usuario:
         raise ValueError("La pregunta no puede estar vacía.")
     api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key or api_key == "tu_llave_aqui":
+        raise RuntimeError("Falta GEMINI_API_KEY: copia .env.example como .env y pon ahí tu llave real.")
+    modelo = MODELO
     modelo = "gemini-3.1-flash-lite"
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent?key={api_key}"
     body = {
@@ -31,17 +42,21 @@ def armar_peticion(pregunta_usuario, system_instruction, response_schema=None):
 #Hacer esto significa: intenta esto, pero si falla esta forma específica, haz esto
 def enviar_peticion(url, body):
     try:
-        respuesta = requests.post(url, json=body)
+        respuesta = requests.post(url, json=body, timeout=60)
+    except requests.exceptions.Timeout:
+        raise RuntimeError("El servicio tardó demasiado en responder (más de 60 segundos).")
     except requests.exceptions.ConnectionError:
         raise RuntimeError("Error de conexión. Por favor, verifica tu conexión a internet.")
     try:
         return respuesta.json()
     except requests.exceptions.JSONDecodeError:
         raise RuntimeError("La respuesta del servicio no llegó en el formato esperado (JSON)")
-    return respuesta.json()
 
 
 def extraer_texto(datos):
+    # Si Gemini respondió con un error (401, 429, 503...), lo mostramos tal cual.
+    if "error" in datos:
+        raise RuntimeError(f"Gemini respondió con error: {datos['error'].get('message', datos['error'])}")
     try:
         return datos["candidates"][0]["content"]["parts"][0]["text"]
     except (KeyError, IndexError):
@@ -61,10 +76,10 @@ def parsear_respuesta_json(texto, claves_esperadas=("nombre", "poder")):
     return datos
 
 
-# Precios en dólares POR TOKEN. Son valores de ejemplo de la lección (inventados):
-# los reales se confirman en la página de precios vigente de Gemini.
-PRECIO_ENTRADA = 0.00000010
-PRECIO_SALIDA = 0.00000040
+# Precios en dólares POR TOKEN de gemini-3.1-flash-lite (0,25 y 1,50 USD por millón),
+# los mismos de docs/decision-arquitectura.md. Fuente: https://ai.google.dev/gemini-api/docs/pricing
+PRECIO_ENTRADA = 0.00000025
+PRECIO_SALIDA = 0.00000150
 
 # Función hermana de extraer_texto: lee la misma respuesta cruda (datos),
 # pero en vez del texto busca usageMetadata para calcular el costo de la petición.
@@ -86,25 +101,34 @@ def obtener_dato_de_prueba(pregunta):
     return texto, costo
 
 
-if __name__ == "__main__":
-    system_instruction = (
-        "Eres un creador de cartas de colección de gatos callejeros. "
-        "Responde únicamente con un objeto JSON válido, sin texto adicional "
-        "y sin usar bloques de markdown. El JSON debe tener exactamente estas "
-        "claves: 'nombre' (string) y 'poder' (string)."
-    )
-    response_schema = {
-        "type": "OBJECT",
-        "properties": {
-            "nombre": {"type": "STRING"},
-            "poder": {"type": "STRING"}
-        },
-        "required": ["nombre", "poder"]
-    }
-    pregunta_usuario = "Un gato negro de ojos amarillos que vive en una plaza."
-    url, body = armar_peticion(pregunta_usuario, system_instruction, response_schema)
+SYSTEM_INSTRUCTION_CARTA = (
+    "Eres un creador de cartas de colección de gatos callejeros. "
+    "Responde únicamente con un objeto JSON válido, sin texto adicional "
+    "y sin usar bloques de markdown. El JSON debe tener exactamente estas "
+    "claves: 'nombre' (string) y 'poder' (string)."
+)
+
+SCHEMA_CARTA = {
+    "type": "OBJECT",
+    "properties": {
+        "nombre": {"type": "STRING"},
+        "poder": {"type": "STRING"}
+    },
+    "required": ["nombre", "poder"]
+}
+
+
+# Flujo completo de la miniaplicación: descripción del gato -> carta (nombre y poder) + costo.
+def crear_carta(descripcion_gato):
+    url, body = armar_peticion(descripcion_gato, SYSTEM_INSTRUCTION_CARTA, SCHEMA_CARTA)
     respuesta_json = enviar_peticion(url, body)
     texto = extraer_texto(respuesta_json)
-    datos = parsear_respuesta_json(texto)
-    print(datos)
-    print(type(datos))
+    carta = parsear_respuesta_json(texto)
+    costo = calcular_costo(respuesta_json, PRECIO_ENTRADA, PRECIO_SALIDA)
+    return carta, costo
+
+
+if __name__ == "__main__":
+    carta, costo = crear_carta("Un gato negro de ojos amarillos que vive en una plaza.")
+    print(carta)
+    print(f"Costo de la petición: {costo:.8f} USD")
