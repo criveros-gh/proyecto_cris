@@ -116,7 +116,7 @@ El módulo no se cae con un `Traceback` ante los errores esperables; muestra un 
 
 ## Registro del ensayo de instalación limpia
 
-- Fecha: AAAA-MM-DD
-- Encontrado: ...
-- Corregido: ...
-- Resultado: ...
+- Fecha: 2026-10-26
+- Encontrado: sin hallazgos en el repositorio. El proyecto se instaló solo con requirements.txt y .env.example, siguiendo este README.
+- Corregido: nada.
+- Resultado: clonado en una carpeta nueva con un entorno virtual nuevo, `python3 main.py` corrió sin errores contra la API real.
