@@ -22,7 +22,6 @@ def armar_peticion(pregunta_usuario, system_instruction=SYSTEM_INSTRUCTION_POR_D
     if not api_key or api_key == "tu_llave_aqui":
         raise RuntimeError("Falta GEMINI_API_KEY: copia .env.example como .env y pon ahí tu llave real.")
     modelo = MODELO
-    modelo = "gemini-3.1-flash-lite"
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent?key={api_key}"
     body = {
         "systemInstruction": {
@@ -43,10 +42,12 @@ def armar_peticion(pregunta_usuario, system_instruction=SYSTEM_INSTRUCTION_POR_D
 def enviar_peticion(url, body):
     try:
         respuesta = requests.post(url, json=body, timeout=60)
-    except requests.exceptions.Timeout:
-        raise RuntimeError("El servicio tardó demasiado en responder (más de 60 segundos).")
-    except requests.exceptions.ConnectionError:
-        raise RuntimeError("Error de conexión. Por favor, verifica tu conexión a internet.")
+    except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+        raise TimeoutError("No se pudo contactar al proveedor. Puede ser momentáneo.")
+    if respuesta.status_code in (401, 403):
+        raise ValueError("Credencial inválida o sin permiso. Revisa tu GEMINI_API_KEY.")
+    if respuesta.status_code == 429 or respuesta.status_code >= 500:
+        raise TimeoutError("El proveedor no pudo procesar la petición. Hay que esperar y reintentar.")
     try:
         return respuesta.json()
     except requests.exceptions.JSONDecodeError:
