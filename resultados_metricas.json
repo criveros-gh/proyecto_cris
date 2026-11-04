@@ -1,0 +1,26 @@
+[
+  {
+    "consulta": "¿Qué comen los gatos callejeros?",
+    "referencia": "Los gatos callejeros comen lo que puedan encontrar.",
+    "respuesta": "Los gatos callejeros se alimentan principalmente de restos de comida humana, presas pequeñas como roedores o aves, y del alimento proporcionado por personas en puntos de alimentación controlados.",
+    "precision": 0.10714285714285714,
+    "cobertura": 0.375,
+    "f1": 0.16666666666666666
+  },
+  {
+    "consulta": "¿Cómo ayudar a un gato callejero en invierno?",
+    "referencia": "Para ayudar a un gato callejero en invierno hay que darle refugio abrigado, comida y agua.",
+    "respuesta": "Proporciónale un refugio seco y aislado con mantas, además de acceso constante a agua fresca y alimento con alto contenido calórico para mantener su temperatura corporal.",
+    "precision": 0.23076923076923078,
+    "cobertura": 0.375,
+    "f1": 0.2857142857142857
+  },
+  {
+    "consulta": "¿Cada cuánto debe ir un gato al veterinario?",
+    "referencia": "Un gato debería ir al veterinario al menos una vez al año para vacunas y control.",
+    "respuesta": "Un gato adulto sano debe acudir al veterinario al menos una vez al año para sus chequeos preventivos y refuerzos de vacunas.",
+    "precision": 0.5909090909090909,
+    "cobertura": 0.8125,
+    "f1": 0.6842105263157896
+  }
+]
