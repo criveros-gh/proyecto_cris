@@ -1,7 +1,14 @@
 from unittest.mock import patch, Mock
 import pytest
+import cliente
 from src.consumir_gemini import enviar_peticion
 from cliente import con_reintento
+
+
+@pytest.fixture(autouse=True)
+def reiniciar_costo_total():
+    cliente.costo_total_sesion = 0
+    yield
 
 
 def test_enviar_peticion_credencial_invalida():
@@ -65,3 +72,16 @@ def test_con_reintento_espera_entre_intentos():
     assert resultado == "ok"
     assert intentos["n"] == 2
     mock_sleep.assert_called_once()
+
+
+def test_registrar_costo_acumula():
+    respuesta_falsa = {"usageMetadata": {"totalTokenCount": 1000}}
+    costo = cliente.registrar_costo(respuesta_falsa)
+    assert costo == cliente.COSTO_POR_1000_TOKENS
+    assert cliente.costo_total_sesion == cliente.COSTO_POR_1000_TOKENS
+
+
+def test_registrar_costo_suma_varias_operaciones():
+    cliente.registrar_costo({"usageMetadata": {"totalTokenCount": 1000}})
+    cliente.registrar_costo({"usageMetadata": {"totalTokenCount": 2000}})
+    assert cliente.costo_total_sesion == pytest.approx(3 * cliente.COSTO_POR_1000_TOKENS)
