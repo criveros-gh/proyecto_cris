@@ -28,6 +28,26 @@ def con_reintento(
             time.sleep(espera_con_jitter)
 
 
+
+COSTO_POR_1000_TOKENS = 0.0015
+costo_total_sesion = 0.0
+
+
+def registrar_costo(respuesta: dict) -> float:
+    global costo_total_sesion
+    uso = respuesta.get("usageMetadata", {})
+    total_tokens = uso.get("totalTokenCount", 0)
+    costo_estimado = (total_tokens / 1000) * COSTO_POR_1000_TOKENS
+    costo_total_sesion += costo_estimado
+    print(f"Operación: {total_tokens} tokens, costo estimado: ${costo_estimado:.5f} (acumulado: ${costo_total_sesion:.5f})")
+    return costo_estimado
+
+
+
+
+
+
+
 def consultar_modelo(
     pregunta: str,
     system_instruction: str = SYSTEM_INSTRUCTION_POR_DEFECTO,
