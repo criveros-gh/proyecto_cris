@@ -2,7 +2,7 @@ from unittest.mock import patch, Mock
 import pytest
 import cliente
 from src.consumir_gemini import enviar_peticion
-from cliente import con_reintento
+from cliente import con_reintento, consultar_modelo
 
 
 @pytest.fixture(autouse=True)
@@ -85,3 +85,29 @@ def test_registrar_costo_suma_varias_operaciones():
     cliente.registrar_costo({"usageMetadata": {"totalTokenCount": 1000}})
     cliente.registrar_costo({"usageMetadata": {"totalTokenCount": 2000}})
     assert cliente.costo_total_sesion == pytest.approx(3 * cliente.COSTO_POR_1000_TOKENS)
+
+
+def test_consultar_modelo_convierte_error():
+    with patch("cliente.armar_peticion", return_value=("https://ejemplo.test", {})):
+        with patch("cliente.con_reintento", side_effect=TimeoutError("simulado")):
+            with pytest.raises(RuntimeError, match="no respondió"):
+                consultar_modelo("pregunta de prueba")
+
+
+def test_consultar_modelo_propaga_value_error():
+    with patch("cliente.armar_peticion", return_value=("https://ejemplo.test", {})):
+        with patch("cliente.con_reintento", side_effect=ValueError("credencial invalida")):
+            with pytest.raises(ValueError, match="credencial invalida"):
+                consultar_modelo("pregunta de prueba")
+
+
+def test_consultar_modelo_exito_devuelve_texto_y_registra_costo():
+    datos_falsos = {
+        "candidates": [{"content": {"parts": [{"text": "hola mundo"}]}}],
+        "usageMetadata": {"totalTokenCount": 1000},
+    }
+    with patch("cliente.armar_peticion", return_value=("https://ejemplo.test", {})):
+        with patch("cliente.con_reintento", return_value=datos_falsos):
+            resultado = consultar_modelo("pregunta de prueba")
+    assert resultado == "hola mundo"
+    assert cliente.costo_total_sesion == cliente.COSTO_POR_1000_TOKENS
