@@ -22,3 +22,16 @@ def con_reintento(
                 raise
             print(f"Intento {intento} de {intentos} falló por límite de uso. Reintentando...")
             time.sleep(espera_segundos)
+
+
+
+def consultar_modelo(
+    pregunta: str,
+    system_instruction: str = SYSTEM_INSTRUCTION_POR_DEFECTO,
+) -> str:
+    url, body = armar_peticion(pregunta, system_instruction)
+    try:
+        datos = con_reintento(lambda: enviar_peticion(url, body))
+    except TimeoutError:
+        raise RuntimeError("El servicio no respondió tras varios intentos. Intenta más tarde.")
+    return extraer_texto(datos)
