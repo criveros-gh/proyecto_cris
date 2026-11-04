@@ -1,4 +1,5 @@
 import time
+import random
 from typing import Callable, Any
 
 from src.consumir_gemini import (
@@ -12,7 +13,8 @@ from src.consumir_gemini import (
 def con_reintento(
     funcion: Callable[[], Any],
     intentos: int = 3,
-    espera_segundos: int = 2,
+    espera_base: float = 2,
+    espera_maxima: float = 30,
 ) -> Any:
     for intento in range(1, intentos + 1):
         try:
@@ -20,9 +22,10 @@ def con_reintento(
         except TimeoutError:
             if intento == intentos:
                 raise
-            print(f"Intento {intento} de {intentos} falló por límite de uso. Reintentando...")
-            time.sleep(espera_segundos)
-
+            espera = min(espera_base * (2 ** (intento - 1)), espera_maxima)
+            espera_con_jitter = espera + random.uniform(0, espera * 0.1)
+            print(f"Intento {intento} de {intentos} falló. Reintentando en {espera_con_jitter:.1f}s...")
+            time.sleep(espera_con_jitter)
 
 
 def consultar_modelo(
