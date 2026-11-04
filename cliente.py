@@ -43,11 +43,6 @@ def registrar_costo(respuesta: dict) -> float:
     return costo_estimado
 
 
-
-
-
-
-
 def consultar_modelo(
     pregunta: str,
     system_instruction: str = SYSTEM_INSTRUCTION_POR_DEFECTO,
@@ -57,4 +52,5 @@ def consultar_modelo(
         datos = con_reintento(lambda: enviar_peticion(url, body))
     except TimeoutError:
         raise RuntimeError("El servicio no respondió tras varios intentos. Intenta más tarde.")
+    registrar_costo(datos)
     return extraer_texto(datos)
