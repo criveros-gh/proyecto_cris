@@ -54,3 +54,12 @@ def consultar_modelo(
         raise RuntimeError("El servicio no respondió tras varios intentos. Intenta más tarde.")
     registrar_costo(datos)
     return extraer_texto(datos)
+
+if __name__ == "__main__":
+    for i in range(40):
+        try:
+            respuesta = consultar_modelo(f"Pregunta de prueba número {i}")
+            print(f"Respuesta {i}: {respuesta[:40]}...")
+        except RuntimeError as error:
+            print(f"Respuesta {i} falló definitivamente: {error}")
+    print(f"Costo total del ensayo: ${costo_total_sesion:.5f}")
