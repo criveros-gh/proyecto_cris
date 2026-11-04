@@ -120,3 +120,13 @@ El módulo no se cae con un `Traceback` ante los errores esperables; muestra un 
 - Encontrado: sin hallazgos en el repositorio. El proyecto se instaló solo con requirements.txt y .env.example, siguiendo este README.
 - Corregido: nada.
 - Resultado: clonado en una carpeta nueva con un entorno virtual nuevo, `python3 main.py` corrió sin errores contra la API real.
+
+## Registro del ensayo de rate limit
+
+- Fecha: 2026-11-04
+- Peticiones enviadas: 40
+- Primer reintento: en la petición número 1 (Respuesta 0). Las respuestas 0 a 3 agotaron los 3 intentos y fallaron definitivamente (probablemente por la cuota aún sin liberar de pruebas anteriores)
+- Esperas observadas: 2.0s a 2.2s en el primer reintento y 4.1s a 4.3s en el segundo (backoff exponencial con jitter, correcto)
+- Respuesta 22: falló una vez, esperó 2.1s y terminó con éxito al reintentar
+- Costo total del ensayo: $0.00363 (36 peticiones exitosas; las 4 fallidas no registraron costo)
+- Resultado: 36 de 40 terminaron con éxito; 4 fallaron definitivamente con RuntimeError y mensaje claro
