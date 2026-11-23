@@ -1,0 +1,1 @@
+{"timestamp": "2026-11-23T18:05:52.556789+00:00", "pregunta": "¿Las pruebas gastan tokens de la API?", "k": 3, "tiempos_ms": {"embed_query": 986.14, "busqueda_vectorial": 4.06, "generacion": 17552.05}, "tiempo_total_ms": 18542.25, "tokens": {"input_tokens": 194, "output_tokens": 24, "total_tokens": 218, "input_token_details": {"cache_read": 0}}}

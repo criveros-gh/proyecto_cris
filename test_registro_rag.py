@@ -82,3 +82,10 @@ def test_preflight_ok_y_con_problemas(tmp_path):
     gi.write_text(".env\n")
     assert any("no esta en" in p for p in pf.preflight_check(str(tmp_path / "vectorstore"), str(gi)))
     assert any("no existe" in p for p in pf.preflight_check(str(tmp_path / "nada"), str(tmp_path / "x")))
+
+
+def test_resumen_error_identifica_el_codigo_sin_filtrar_el_mensaje():
+    r = rr.resumen_error(RuntimeError("503 UNAVAILABLE: key=SECRETO"))
+    assert "503" in r and "SECRETO" not in r
+    assert "429" in rr.resumen_error(RuntimeError("429 RESOURCE_EXHAUSTED"))
+    assert rr.resumen_error(ValueError("algo raro")) == "ValueError"

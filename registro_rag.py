@@ -67,6 +67,22 @@ def registrar_consulta(pregunta, vectorstore, embeddings, modelo, k=3,
     return registro
 
 
+def resumen_error(error):
+    """Diagnostico corto y seguro: solo el codigo conocido, nunca el mensaje completo
+    (puede traer datos sensibles)."""
+    texto = str(error)
+    for codigo, significado in (
+        ("503", "servicio saturado, reintentar mas tarde"),
+        ("429", "limite de uso alcanzado, esperar un minuto"),
+        ("401", "clave rechazada"),
+        ("403", "clave rechazada o sin permiso"),
+        ("404", "modelo no encontrado"),
+    ):
+        if codigo in texto:
+            return f"{type(error).__name__} {codigo}: {significado}"
+    return type(error).__name__
+
+
 def guardar_registro(registro, archivo=ARCHIVO_REGISTROS):
     """Una corrida por linea (JSON Lines). Solo corridas reales."""
     with open(archivo, "a", encoding="utf-8") as f:
@@ -98,7 +114,7 @@ if __name__ == "__main__":
         try:
             registro = registrar_consulta(pregunta, tienda, embeddings, modelo, k=3)
         except Exception as error:
-            print(f"No se pudo registrar '{pregunta}': {type(error).__name__}")
+            print(f"No se pudo registrar '{pregunta}': {resumen_error(error)}")
             continue
         print(json.dumps(registro, indent=2, ensure_ascii=False))
         guardar_registro(registro)
@@ -109,4 +125,4 @@ if __name__ == "__main__":
         print(json.dumps(registro, indent=2, ensure_ascii=False))
         guardar_registro(registro)
     except Exception as error:
-        print(f"No se pudo registrar k=6: {type(error).__name__}")
+        print(f"No se pudo registrar k=6: {resumen_error(error)}")
