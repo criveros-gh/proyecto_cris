@@ -90,6 +90,50 @@ def resolver(app, config, aprobar, huella_esperada=None):
     return app.invoke(Command(resume=aprobar), config=config)
 
 
+# ---------- Segundo punto de supervision: respuestas marcadas del servicio (Gate 2)
+# Una respuesta se retiene para revision humana cuando hubo un intento de inyeccion
+# en lo recuperado o cuando las citas no son verificables. La persona decide si se
+# entrega; por defecto (sin decision) NO se entrega.
+class EstadoRevision(TypedDict):
+    motivos: list
+    propuesta: str
+    fuentes: list
+    aprobado: bool
+    resultado: str
+
+
+def revisar_respuesta(estado: EstadoRevision):
+    decision = interrupt({
+        "motivo": "revisar respuesta marcada antes de entregarla",
+        "motivos": estado["motivos"],
+        "propuesta": estado["propuesta"],
+        "fuentes": estado["fuentes"],
+    })
+    return {"aprobado": decision}
+
+
+def liberar_respuesta(estado: EstadoRevision):
+    return {"resultado": "entregada" if estado["aprobado"] else "retenida"}
+
+
+def construir_grafo_revision(checkpointer=None):
+    grafo = StateGraph(EstadoRevision)
+    grafo.add_node("revisar_respuesta", revisar_respuesta)
+    grafo.add_node("liberar_respuesta", liberar_respuesta)
+    grafo.add_edge(START, "revisar_respuesta")
+    grafo.add_edge("revisar_respuesta", "liberar_respuesta")
+    grafo.add_edge("liberar_respuesta", END)
+    return grafo.compile(checkpointer=checkpointer or InMemorySaver())
+
+
+def solicitar_revision(app, motivos, propuesta, fuentes):
+    """Deja una respuesta PAUSADA esperando decision humana. Devuelve su config."""
+    config = {"configurable": {"thread_id": nuevo_thread_id("revision")}}
+    app.invoke({"motivos": list(motivos), "propuesta": propuesta, "fuentes": list(fuentes),
+                "aprobado": False, "resultado": ""}, config=config)
+    return config
+
+
 if __name__ == "__main__":
     app = construir_grafo()
     huella = "ba2bcb4f4f13"  # ejemplo; en el flujo real sale de registro_prompts

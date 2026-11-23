@@ -61,38 +61,70 @@ def registrar_consumo(respuesta):
     }})
 
 
+def evento(nombre, nivel=logging.INFO, **campos):
+    """Evento estructurado con el trace_id activo. SOLO campos seguros:
+    conteos, longitudes, huellas, nombres de fuente. Nunca texto crudo."""
+    logging.getLogger(NOMBRE_LOGGER).log(
+        nivel, nombre.replace("_", " "),
+        extra={"extra_data": {"evento": nombre, **campos}},
+    )
+
+
+def agregar_archivo_de_log(ruta):
+    """Ademas de la consola, escribe los mismos eventos JSON en un archivo
+    (idempotente: no duplica el handler si ya existe para esa ruta)."""
+    import os
+
+    ruta = os.path.abspath(ruta)
+    os.makedirs(os.path.dirname(ruta), exist_ok=True)
+    log = logging.getLogger(NOMBRE_LOGGER)
+    for h in log.handlers:
+        if isinstance(h, logging.FileHandler) and h.baseFilename == ruta:
+            return ruta
+    handler = logging.FileHandler(ruta, encoding="utf-8")
+    handler.setFormatter(JsonFormatter())
+    log.addHandler(handler)
+    return ruta
+
+
+def registrar_consulta_recibida(pregunta):
+    evento("consulta_recibida", pregunta_len=len(pregunta), pregunta_huella=huella(pregunta))
+
+
+def filtrar_y_registrar(documentos_recuperados):
+    """Registra lo recuperado, filtra inyecciones y registra lo descartado.
+    Devuelve los documentos limpios."""
+    evento(
+        "documentos_recuperados",
+        n_recuperados=len(documentos_recuperados),
+        fuentes=[d.metadata.get("fuente", "desconocida") for d in documentos_recuperados],
+    )
+    limpios, descartados = filtrar_documentos(documentos_recuperados)
+    for doc, patrones in descartados:
+        evento(
+            "documento_descartado_por_inyeccion", logging.WARNING,
+            fuente=doc.metadata.get("fuente", "desconocida"),
+            n_patrones=len(patrones),
+            huella=huella(doc.page_content),
+        )
+    evento("contexto_filtrado", n_limpios=len(limpios), n_descartados=len(descartados))
+    return limpios
+
+
 def procesar_consulta(pregunta, documentos_recuperados):
     """Registra la consulta de punta a punta y devuelve los documentos limpios.
-    Leyendo solo los logs se puede reconstruir que paso, sin ver el contenido."""
-    log = logging.getLogger(NOMBRE_LOGGER)
-    token = trace_id_var.set("trace-" + uuid.uuid4().hex[:8])   # uno por consulta
+    Leyendo solo los logs se puede reconstruir que paso, sin ver el contenido.
+    Si ya hay un trace_id activo (lo abrio el servicio) lo reutiliza; si no,
+    abre uno propio y lo cierra al terminar."""
+    token = None
+    if trace_id_var.get() is None:
+        token = trace_id_var.set("trace-" + uuid.uuid4().hex[:8])   # uno por consulta
     try:
-        log.info("consulta recibida", extra={"extra_data": {
-            "evento": "consulta_recibida",
-            "pregunta_len": len(pregunta),
-            "pregunta_huella": huella(pregunta),
-        }})
-        log.info("documentos recuperados", extra={"extra_data": {
-            "evento": "documentos_recuperados",
-            "n_recuperados": len(documentos_recuperados),
-            "fuentes": [d.metadata.get("fuente", "desconocida") for d in documentos_recuperados],
-        }})
-        limpios, descartados = filtrar_documentos(documentos_recuperados)
-        for doc, patrones in descartados:
-            log.warning("documento descartado por inyeccion", extra={"extra_data": {
-                "evento": "documento_descartado_por_inyeccion",
-                "fuente": doc.metadata.get("fuente", "desconocida"),
-                "n_patrones": len(patrones),
-                "huella": huella(doc.page_content),
-            }})
-        log.info("contexto filtrado", extra={"extra_data": {
-            "evento": "contexto_filtrado",
-            "n_limpios": len(limpios),
-            "n_descartados": len(descartados),
-        }})
-        return limpios
+        registrar_consulta_recibida(pregunta)
+        return filtrar_y_registrar(documentos_recuperados)
     finally:
-        trace_id_var.reset(token)
+        if token is not None:
+            trace_id_var.reset(token)
 
 
 if __name__ == "__main__":

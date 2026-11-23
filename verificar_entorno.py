@@ -5,8 +5,9 @@ from importlib.metadata import PackageNotFoundError, version
 
 from dotenv import load_dotenv
 
-PAQUETES = ["google-genai", "langchain", "langchain-google-genai",
-            "langchain-chroma", "chromadb", "python-dotenv", "pytest"]
+PAQUETES = ["google-genai", "langchain", "langchain-core", "langchain-google-genai",
+            "langchain-chroma", "chromadb", "langgraph", "python-dotenv", "pytest"]
+DIRECTORIO_INDICE = "vectorstore"   # indice persistido (python indexar_corpus.py)
 
 
 def revisar():
@@ -30,6 +31,12 @@ def revisar():
         lineas.append("GEMINI_API_KEY detectada")   # nunca se imprime su valor
     else:
         lineas.append('FALTA: GEMINI_API_KEY (agrégala al archivo ".env")')
+        ok = False
+
+    if os.path.isdir(DIRECTORIO_INDICE) and os.listdir(DIRECTORIO_INDICE):
+        lineas.append(f"indice en {DIRECTORIO_INDICE}/ OK")
+    else:
+        lineas.append(f"FALTA: indice en {DIRECTORIO_INDICE}/  ->  python indexar_corpus.py")
         ok = False
     return ok, lineas
 

@@ -102,10 +102,12 @@ RIESGOS = [
     {"riesgo": "Inyeccion de prompt via documento recuperado",
      "probabilidad": 4, "impacto": 4,
      "mitigacion": "Roles separados, contexto delimitado y filtro de patrones en "
-                   "seguridad_prompt.py (Bloque 31); lo descartado queda en el log",
-     "estado": "parcial",
-     "supervision": "Si el filtro descarta un documento, revision humana antes de entregar "
-                    "la respuesta (se conecta en servicio_rag.py, Gate 2)"},
+                   "seguridad_prompt.py (Bloque 31); lo descartado queda en el log; "
+                   "si todo el contexto es sospechoso no se llama al modelo (servicio_rag.py)",
+     "estado": "construida",
+     "supervision": "Si el filtro descarta un documento, la respuesta queda pausada con "
+                    "interrupt() hasta que una persona decide (servicio_rag.py + "
+                    "grafo_supervision.py, Bloque 32)"},
     {"riesgo": "Contenido crudo o datos personales en los logs",
      "probabilidad": 3, "impacto": 5,
      "mitigacion": "logging_rag.py registra huellas y largos, nunca la pregunta ni "
@@ -116,10 +118,11 @@ RIESGOS = [
     {"riesgo": "Respuesta con cita inventada o sin respaldo en las fuentes",
      "probabilidad": 3, "impacto": 4,
      "mitigacion": "Prompt que exige [n] y admitir contexto insuficiente, mas "
-                   "verificar_citas en recuperacion.py (Bloque 26)",
-     "estado": "parcial",
-     "supervision": "Una respuesta con citas invalidas se marca para revision y no se "
-                    "entrega como definitiva (Gate 2)"},
+                   "verificar_citas en recuperacion.py (Bloque 26); el servicio solo "
+                   "entrega fuentes verificadas contra el contexto",
+     "estado": "construida",
+     "supervision": "Sin citas validas o con citas inventadas la respuesta queda pausada "
+                    "para revision humana (servicio_rag.py + grafo_supervision.py)"},
     {"riesgo": "Recuperacion deficiente: el chunk relevante no llega al contexto",
      "probabilidad": 3, "impacto": 3,
      "mitigacion": "precision@k y recall@k sobre 12 casos con k=1/3/5 "
@@ -129,9 +132,10 @@ RIESGOS = [
                     "corpus, chunk_size o modelo de embeddings"},
     {"riesgo": "Proveedor del modelo con errores intermitentes (503) o rate limit",
      "probabilidad": 4, "impacto": 3,
-     "mitigacion": "Reintentos con backoff en cliente.py (Unidad 2.1) y errores "
-                   "resumidos sin romper el flujo en registro_rag.py (Bloque 28)",
-     "estado": "parcial",
+     "mitigacion": "Reintentos con backoff en cliente.py (Unidad 2.1) y en "
+                   "servicio_rag.py (probado con fallas simuladas, no contra una caida "
+                   "real); si persiste devuelve estado 'error' sin Traceback",
+     "estado": "construida",
      "supervision": "Si fallan todos los reintentos el servicio avisa y no inventa "
                     "respuesta; un operador decide reintentar o escalar"},
     {"riesgo": "Costo o latencia por consulta fuera de lo esperado",
