@@ -17,8 +17,8 @@ pluggy==1.7.0
 pyasn1==0.6.4
 pyasn1_modules==0.4.2
 pycparser==3.11
-pydantic==2.14.1
-pydantic_core==2.50.1
+pydantic==2.14.4
+pydantic_core==2.50.5
 Pygments==2.21.0
 pytest==9.2.0
 python-dotenv==1.2.4
@@ -32,3 +32,6 @@ websockets==16.1.1
 langchain
 langchain-google-genai
 langchain-classic
+langchain-chroma
+chromadb
+langchain-text-splitters

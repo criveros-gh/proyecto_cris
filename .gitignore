@@ -19,3 +19,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Indice generado (se reconstruye con indexar_corpus.py)
+vectorstore/
