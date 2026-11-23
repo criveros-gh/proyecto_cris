@@ -35,3 +35,4 @@ langchain-classic
 langchain-chroma
 chromadb
 langchain-text-splitters
+langgraph
