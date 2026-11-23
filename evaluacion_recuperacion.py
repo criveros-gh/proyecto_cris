@@ -4,6 +4,7 @@ Las etiquetas (ids_relevantes) se escribieron LEYENDO EL CORPUS (indexar_corpus.
 antes de ver lo que devuelve el retriever. No se ajustan para que "den bien".
 """
 import os
+import sys
 from datetime import date
 
 from dotenv import load_dotenv
@@ -97,8 +98,10 @@ if __name__ == "__main__":
     tienda = cargar_vectorstore(embeddings, DIRECTORIO_INDICE)
     if tienda._collection.count() == 0:
         raise SystemExit("El índice está vacío. Corre primero: python indexar_corpus.py")
-    retriever = tienda.as_retriever(search_kwargs={"k": K})
-    resultados, p_prom, r_prom = evaluar_recuperacion(retriever, CASOS_EVALUACION, K)
-    texto = formatear_resultados(resultados, p_prom, r_prom, K)
+    # k opcional por consola: python evaluacion_recuperacion.py 1
+    k = int(sys.argv[1]) if len(sys.argv) > 1 else K
+    retriever = tienda.as_retriever(search_kwargs={"k": k})
+    resultados, p_prom, r_prom = evaluar_recuperacion(retriever, CASOS_EVALUACION, k)
+    texto = formatear_resultados(resultados, p_prom, r_prom, k)
     print(texto)
-    print("Guardado en", guardar_resultados(texto, K))
+    print("Guardado en", guardar_resultados(texto, k))

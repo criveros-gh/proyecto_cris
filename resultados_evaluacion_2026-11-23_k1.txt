@@ -1,0 +1,17 @@
+Fecha: 2026-11-23
+Configuracion: k=1, chunk_size=200, chunk_overlap=30
+
+1.00 1.00 ¿Cómo clasifica el sistema el mensaje del usuario?
+1.00 1.00 ¿Qué respuesta se da si falla la cadena de emergencia?
+1.00 1.00 ¿Qué se hace con los errores del sistema?
+1.00 1.00 ¿Cómo decide el agente qué herramienta usar?
+1.00 1.00 ¿Qué herramientas tiene el agente para cuidar gatos?
+1.00 1.00 ¿Cómo se guarda la memoria del agente?
+1.00 1.00 ¿Por qué no deben mezclarse las sesiones de distintos usuarios?
+1.00 1.00 ¿Qué acciones necesitan aprobación humana?
+1.00 1.00 ¿Qué pasa si nadie responde a una solicitud de aprobación?
+1.00 1.00 ¿Cómo son las pruebas automáticas del proyecto?
+1.00 1.00 ¿Las pruebas gastan tokens de la API?
+0.00 n/a ¿Cuánto cuesta arrendar una oficina en Santiago?
+
+promedio -> precision: 0.917 recall: 1.000 F1: 0.957
