@@ -31,3 +31,4 @@ urllib3==2.8.0
 websockets==16.1.1
 langchain
 langchain-google-genai
+langchain-classic
