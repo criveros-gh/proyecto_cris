@@ -10,17 +10,153 @@
   {
     "consulta": "¿Cómo ayudar a un gato callejero en invierno?",
     "referencia": "Para ayudar a un gato callejero en invierno hay que darle refugio abrigado, comida y agua.",
-    "respuesta": "Proporciónale un refugio seco y aislado con mantas, además de acceso constante a agua fresca y alimento con alto contenido calórico para mantener su temperatura corporal.",
-    "precision": 0.23076923076923078,
-    "cobertura": 0.375,
-    "f1": 0.2857142857142857
+    "respuesta": "Puedes ayudar proporcionándole un refugio seco y aislado con mantas, además de agua fresca y comida rica en calorías para mantener su temperatura corporal.",
+    "precision": 0.3333333333333333,
+    "cobertura": 0.5,
+    "f1": 0.4
   },
   {
     "consulta": "¿Cada cuánto debe ir un gato al veterinario?",
     "referencia": "Un gato debería ir al veterinario al menos una vez al año para vacunas y control.",
-    "respuesta": "Un gato adulto sano debe acudir al veterinario al menos una vez al año para sus chequeos preventivos y refuerzos de vacunas.",
-    "precision": 0.5909090909090909,
+    "respuesta": "Un gato adulto sano debe acudir al veterinario al menos una vez al año para un chequeo general y sus vacunas de refuerzo.",
+    "precision": 0.5652173913043478,
     "cobertura": 0.8125,
-    "f1": 0.6842105263157896
+    "f1": 0.6666666666666667
+  },
+  {
+    "consulta": "¿A qué edad se puede esterilizar a un gato?",
+    "referencia": "Un gato se puede esterilizar desde los cuatro a seis meses de edad.",
+    "respuesta": "Los gatos pueden ser esterilizados de forma segura a partir de los cuatro meses de edad o cuando alcanzan un peso aproximado de un kilo.",
+    "precision": 0.28,
+    "cobertura": 0.5384615384615384,
+    "f1": 0.3684210526315789
+  },
+  {
+    "consulta": "¿Cuántas horas al día duerme un gato adulto?",
+    "referencia": "Un gato adulto duerme entre 12 y 16 horas al día.",
+    "respuesta": "Un gato adulto duerme, en promedio, entre 12 y 16 horas al día, aunque algunos pueden llegar a descansar hasta 20 horas.",
+    "precision": 0.5,
+    "cobertura": 1.0,
+    "f1": 0.6666666666666666
+  },
+  {
+    "consulta": "¿Se le puede dar leche de vaca a un gato?",
+    "referencia": "No, la leche de vaca no es recomendable porque la mayoría de los gatos adultos no la digieren y les produce diarrea.",
+    "respuesta": "No, no debes darle leche de vaca a un gato porque la mayoría son intolerantes a la lactosa y puede causarles problemas digestivos graves.",
+    "precision": 0.4166666666666667,
+    "cobertura": 0.45454545454545453,
+    "f1": 0.43478260869565216
+  },
+  {
+    "consulta": "¿Cuánto vive en promedio un gato callejero?",
+    "referencia": "Un gato callejero vive en promedio entre 2 y 5 años, mucho menos que un gato de hogar.",
+    "respuesta": "Un gato callejero vive en promedio entre 2 y 5 años debido a los múltiples riesgos del entorno, a diferencia de los gatos domésticos que pueden superar los 15.",
+    "precision": 0.4482758620689655,
+    "cobertura": 0.7222222222222222,
+    "f1": 0.5531914893617021
+  },
+  {
+    "consulta": "¿Cada cuánto se debe desparasitar a un gato?",
+    "referencia": "Un gato adulto se debe desparasitar cada tres meses.",
+    "respuesta": "Los gatos callejeros o con acceso al exterior deben ser desparasitados interna y externamente cada mes para prevenir infestaciones recurrentes.",
+    "precision": 0.05,
+    "cobertura": 0.1111111111111111,
+    "f1": 0.06896551724137932
+  },
+  {
+    "consulta": "¿Pueden los gatos comer chocolate?",
+    "referencia": "No, el chocolate es tóxico para los gatos y puede ser peligroso.",
+    "respuesta": "No, el chocolate es altamente tóxico para los gatos debido a la teobromina y la cafeína que contiene, por lo que nunca deben consumirlo.",
+    "precision": 0.375,
+    "cobertura": 0.75,
+    "f1": 0.5
+  },
+  {
+    "consulta": "¿Cuánto dura la gestación de una gata?",
+    "referencia": "La gestación de una gata dura entre 63 y 65 días, unas nueve semanas.",
+    "respuesta": "La gestación de una gata dura, en promedio, entre 63 y 67 días.",
+    "precision": 0.7692307692307693,
+    "cobertura": 0.7142857142857143,
+    "f1": 0.7407407407407408
+  },
+  {
+    "consulta": "¿Cuántas crías puede tener una gata por camada?",
+    "referencia": "Una gata suele tener entre tres y cinco crías por camada.",
+    "respuesta": "Una gata suele tener entre cuatro y seis crías por camada, aunque el número puede variar generalmente de una a ocho.",
+    "precision": 0.42857142857142855,
+    "cobertura": 0.8181818181818182,
+    "f1": 0.5625
+  },
+  {
+    "consulta": "¿Es seguro darle atún en lata a un gato todos los días?",
+    "referencia": "No, el atún en lata todos los días no es seguro porque no cubre sus nutrientes y puede tener mercurio; solo de forma ocasional.",
+    "respuesta": "No es recomendable, ya que el atún enlatado para consumo humano puede causar deficiencias nutricionales y problemas de salud debido a su exceso de sodio y mercurio.",
+    "precision": 0.2962962962962963,
+    "cobertura": 0.3333333333333333,
+    "f1": 0.3137254901960785
+  },
+  {
+    "consulta": "¿Cómo sé si un gato callejero está herido?",
+    "referencia": "Un gato herido puede cojear, tener heridas o sangre, esconderse, no comer y maullar de dolor.",
+    "respuesta": "Observa si cojea al caminar, si presenta heridas visibles, abscesos, secreciones extrañas en ojos o nariz, o si muestra un comportamiento apático y evita comer.",
+    "precision": 0.2,
+    "cobertura": 0.3125,
+    "f1": 0.24390243902439027
+  },
+  {
+    "consulta": "¿Qué hago si encuentro un gatito recién nacido solo en la calle?",
+    "referencia": "Hay que observar de lejos unas horas porque la madre puede volver; si no vuelve, abrigarlo y llevarlo al veterinario.",
+    "respuesta": "Si el gatito no está en peligro inmediato, espera a distancia prudente para ver si la madre regresa, y si no lo hace, mantenlo caliente y busca asistencia veterinaria o de un refugio especializado urgentemente.",
+    "precision": 0.17142857142857143,
+    "cobertura": 0.3,
+    "f1": 0.21818181818181817
+  },
+  {
+    "consulta": "¿Por qué ronronea un gato?",
+    "referencia": "Un gato ronronea cuando está tranquilo y contento, pero también para calmarse cuando tiene estrés o dolor.",
+    "respuesta": "Un gato ronronea principalmente para expresar bienestar y satisfacción, aunque también puede hacerlo como un mecanismo de autocalma frente al estrés o el dolor.",
+    "precision": 0.375,
+    "cobertura": 0.5294117647058824,
+    "f1": 0.4390243902439025
+  },
+  {
+    "consulta": "¿Cuál es la temperatura corporal normal de un gato?",
+    "referencia": "La temperatura normal de un gato está entre 38 y 39 grados Celsius.",
+    "respuesta": "La temperatura corporal normal de un gato oscila entre los 38 °C y los 39,2 °C.",
+    "precision": 0.5625,
+    "cobertura": 0.6923076923076923,
+    "f1": 0.6206896551724138
+  },
+  {
+    "consulta": "¿Pueden los gatos ver en la oscuridad?",
+    "referencia": "Los gatos no ven en oscuridad total, pero ven con muy poca luz, mucho mejor que los humanos.",
+    "respuesta": "Aunque no ven en la oscuridad absoluta, los gatos poseen una visión nocturna excepcional gracias a una estructura en sus ojos llamada *tapetum lucidum*, que les permite aprovechar al máximo la más mínima luz disponible.",
+    "precision": 0.22857142857142856,
+    "cobertura": 0.4444444444444444,
+    "f1": 0.3018867924528302
+  },
+  {
+    "consulta": "¿Para qué sirve ponerle un microchip a un gato?",
+    "referencia": "El microchip sirve para identificar al gato y encontrar a su dueño si se pierde.",
+    "respuesta": "El microchip sirve para identificar de forma permanente al gato y facilitar su localización o recuperación en caso de pérdida o abandono.",
+    "precision": 0.4090909090909091,
+    "cobertura": 0.6,
+    "f1": 0.4864864864864865
+  },
+  {
+    "consulta": "¿Qué hago si encuentro un gato perdido con collar?",
+    "referencia": "Hay que revisar si el collar tiene chapita con teléfono, y llevarlo al veterinario para ver si tiene microchip.",
+    "respuesta": "Intenta contactar al dueño mediante el número de teléfono en la placa, verifica si tiene microchip en un veterinario cercano y difunde su foto en redes sociales y grupos vecinales.",
+    "precision": 0.26666666666666666,
+    "cobertura": 0.42105263157894735,
+    "f1": 0.326530612244898
+  },
+  {
+    "consulta": "¿Puede un gato comer alimento para perros de forma permanente?",
+    "referencia": "No, el alimento para perros no cubre lo que necesita un gato, como la taurina y más proteína.",
+    "respuesta": "No, los gatos son carnívoros estrictos y el alimento para perros carece de taurina y los nutrientes esenciales que ellos necesitan para sobrevivir, por lo que su consumo permanente les causaría graves problemas de salud.",
+    "precision": 0.2571428571428571,
+    "cobertura": 0.5,
+    "f1": 0.33962264150943394
   }
 ]
