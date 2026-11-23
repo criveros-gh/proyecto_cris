@@ -12,10 +12,16 @@ Estructura (una responsabilidad por bloque):
     2. Las rutas posibles.
     3. La bifurcacion que las conecta.
 """
+import logging
+
 from dotenv import load_dotenv
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
-from langchain_core.runnables import RunnableBranch, RunnablePassthrough
+from langchain_core.runnables import (
+    RunnableBranch,
+    RunnableLambda,
+    RunnablePassthrough,
+)
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 from cadena_tres_pasos import MODELO
@@ -101,12 +107,53 @@ def construir_cadena_con_enrutamiento(
     return RunnablePassthrough.assign(categoria=paso_clasificacion) | bifurcacion
 
 
+# --- 4. Manejo de errores (Bloque 20) --------------------------------------
+logger = logging.getLogger(__name__)
+
+# Respaldo para la ruta de emergencia: NO es solo "hubo un error". Entrega
+# pasos seguros y utiles aunque el modelo no responda.
+respuesta_generica_emergencia = RunnableLambda(
+    lambda x: (
+        "No pudimos generar una respuesta automatica ahora. Mientras tanto: "
+        "mantén la calma, no muevas bruscamente al gato, abrigalo con una "
+        "toalla y llama a una clinica veterinaria o a un rescatista de "
+        "animales de tu zona lo antes posible."
+    )
+)
+
+
+def construir_cadena_emergencia_segura(cadena_emergencia):
+    """Protege la ruta de emergencia: si el modelo falla, usa el respaldo."""
+    return cadena_emergencia.with_fallbacks([respuesta_generica_emergencia])
+
+
+def procesar_mensaje_seguro(cadena, mensaje):
+    """Red de seguridad final: ningun fallo deja al usuario sin respuesta.
+
+    La cadena llega como parametro (no se lee de una variable global) para
+    poder inyectar una cadena falsa en las pruebas.
+    Manejar un error no es ocultarlo: queda registrado con su traceback.
+    """
+    try:
+        return cadena.invoke({"mensaje": mensaje})
+    except Exception:
+        logger.exception("Error procesando mensaje")
+        return (
+            "No pudimos procesar tu mensaje en este momento. "
+            "Intenta de nuevo mas tarde."
+        )
+
+
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     load_dotenv()
     modelo = ChatGoogleGenerativeAI(model=MODELO, temperature=0)
     emergencia, adopcion, consulta = construir_rutas(modelo)
     cadena = construir_cadena_con_enrutamiento(
-        construir_paso_clasificacion(modelo), emergencia, adopcion, consulta
+        construir_paso_clasificacion(modelo),
+        construir_cadena_emergencia_segura(emergencia),
+        adopcion,
+        consulta,
     )
 
     mensajes = [
@@ -116,5 +163,5 @@ if __name__ == "__main__":
     ]
     for mensaje in mensajes:
         print("MENSAJE:", mensaje)
-        print(cadena.invoke({"mensaje": mensaje}))
+        print(procesar_mensaje_seguro(cadena, mensaje))
         print("-" * 60)
